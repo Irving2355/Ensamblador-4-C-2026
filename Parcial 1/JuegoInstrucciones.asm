@@ -62,6 +62,71 @@ main:
     XOR AL, AL ; AL = 0 
     
     MOV AL, 55h
-    NOT AL ; AL = AA
+    NOT AL ; AL = AA 
+    
+    ;***********    COMPARACIONES ***********
+    
+    ;CMP COMPARE
+    ;RESTA PERO NO GUARDA EL RESULTADO SOLO ACTIVA FLAGS
+    
+    
+    MOV AX, 5
+    MOV BX, 5
+    CMP AX, BX ;ZF=1 (SON IGUALES)
+    
+    ;TEST ES UN AND SIN GUARDAR
+    MOV AL, 08h  ;00001000
+    TEST AL, 08h ;ESTA EL BIT ENCENDIDO ZF=0 si SI
+    
+    
+    ;*********  SALTOS *************
+    
+    ;JMP SALTO INCONDICIONAL
+    
+    MOV AX, 1  
+    
+    JMP ETIQUETA
+    
+    MOV AX, 9999h ;IGNORA EL MOVIMIENTO
+    
+    ETIQUETA:
+        MOV BX, 2 
+    
+    
+    ;JE  JUMP EQUAL
+    ;JNE JUMP NOT EQUAL   
+    
+    MOV AX, 7
+    CMP AX, 7
+    JE IGUALES
+    
+    MOV BX, 1
+    JMP FIN
+    
+    IGUALES:
+        MOV BX, 2
+    
+    FIN:
+        ;MOV AH, 4Ch
+        ;INT 21H
+   
+    MOV AX, 7
+    CMP AX, 8     ;ZF=0
+    JNE DIFERENTES
+    
+    MOV BX, 1
+    JMP FIN  
+    
+    DIFERENTES:
+        MOV BX, 2 
+    
+    FIN:
+    
+    ;JZ     ZF=1
+    ;JNZ    ZF=0
+    ;JC     CF=1
+    ;JNC    CF=0
+    
+    
 
 END main
