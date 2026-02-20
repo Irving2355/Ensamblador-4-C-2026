@@ -7,13 +7,13 @@
 .stack 100h
 
 .data 
+;tranformar binarios a hexa
+regCtrl db 03h;00000011b
 
-regCtrl db 00000011b
-
-MASK_LED    equ 00000001  ;equ es una cosntante
-MASK_MOTOR  equ 00000010  ;simbolica
-MASK_ALARM  equ 00000100
-MASK_SAFE   equ 00001000
+MASK_LED    equ 01h;00000001  ;equ es una cosntante
+MASK_MOTOR  equ 02h;00000010  ;simbolica
+MASK_ALARM  equ 04h;00000100
+MASK_SAFE   equ 08h;00001000
 
 outAfterOr  db 0
 outAfterAnd db 0
@@ -28,13 +28,15 @@ main:
     ;encender led y alarma 
     ;OR enciende bits
     mov al, regCtrl 
-    or  al, (MASK_LED OR MASK_ALARM) 
+    or  al, (MASK_LED + MASK_ALARM) ;no se permite or en las mascaras 
     mov outAfterOr, al
     
     ;apagar motor
     ;usamos and para apagar bits
     mov al, outAfterOr     ;00000011
-    and al, NOT MASK_MOTOR ;11111101
+    mov bl, MASK_MOTOR
+    not bl
+    and al, bl             ;11111101
                            ;00000001
     mov outAfterAnd, al
     
