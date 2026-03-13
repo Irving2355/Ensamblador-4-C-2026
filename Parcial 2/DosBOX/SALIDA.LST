@@ -1,0 +1,172 @@
+Microsoft (R) Macro Assembler Version 5.00                  3/13/26 08:25:20
+                                                             Page     1-1
+
+
+				;punto flotante  
+				.model small 
+ 0100				.stack 100h 
+				 
+ 0000				.data 
+ 0000  0005			A_int dw 5 
+ 0002  0032			A_frac dw 50 
+ 0004  0002			B_int dw 2 
+ 0006  0019			B_frac dw 25 
+				 
+				;float 32-bit (REAL4) 
+ 0008  00004040			C3 dd 3.0 
+ 000C  00008040			C4 dd 4.0 
+ 0010  CDCCCC3D			T1 dd 0.10 
+ 0014  CDCC4C3E			T2 dd 0.20 
+				 
+ 0018  ????????			A_val dd ? 
+ 001C  ????????			B_val dd ? 
+ 0020  ????????			sumaAB dd ? 
+ 0024  ????????			prodAB dd ? 
+ 0028  ????????			divAB dd ? 
+ 002C  ????????			sqrtD dd ? 
+ 0030  ????????			exprZ dd ? 
+ 0034  ????????			testT dd ? 
+ 0038  0000			tmpInt dw 0 
+ 003A  0000			tmpFrac dw 0 
+ 003C  0064			HUNDRED dw 100 
+ 003E  0000			dataSeg dw 0  
+				 
+ 0000				.code 
+				 
+ 0000				make_real_from_parts proc 
+ 0000  9B DF 06 0038 R		    fild tmpInt   ;sto = int 
+ 0005  9B DF 06 003A R		    fild tmpFrac  ; fracc, st1= int 
+ 000A  9B DE 36 003C R		    fidiv HUNDRED ; fracc/100  
+ 000F  9B DE C1			    fadd          ; sto = int + (fracc/100) 5 +
+				 .50  
+ 0012  C3			    ret  
+ 0013				make_real_from_parts endp 
+ 0013				main: 
+				 
+ 0013  B8 ---- R		    mov ax, @data 
+ 0016  8E D8			    mov ds, ax 
+				 
+				    ; construir A_val 
+ 0018  A1 0000 R		    mov ax, A_int 
+ 001B  A3 0038 R		    mov tmpInt, ax 
+ 001E  A1 0002 R		    mov ax, A_frac 
+ 0021  A3 003A R		    mov tmpFrac, ax  
+ 0024  E8 0000 R		    call make_real_from_parts  
+ 0027  9B D9 1E 0018 R		    fstp A_val 
+				 
+				    ; construir B_val 
+ 002C  A1 0004 R		    mov ax, B_int 
+Microsoft (R) Macro Assembler Version 5.00                  3/13/26 08:25:20
+                                                             Page     1-2
+
+
+ 002F  A3 0038 R		    mov tmpInt, ax 
+ 0032  A1 0006 R		    mov ax, B_frac 
+ 0035  A3 003A R		    mov tmpFrac, ax  
+ 0038  E8 0000 R		    call make_real_from_parts  
+ 003B  9B D9 1E 001C R		    fstp B_val 
+				 
+				    ;******** suma *********** 
+ 0040  9B D9 06 0018 R		    fld A_val ; sto = A_val 
+ 0045  9B D9 06 001C R		    fld B_val ; sto = B_val, A_val 
+ 004A  9B DE C1			    fadd  
+ 004D  9B D9 1E 0020 R		    fstp sumaAB 
+				 
+				    ;***** producto ****** 
+ 0052  9B D9 06 0018 R		    fld A_val 
+ 0057  9B D9 06 001C R		    fld B_val 
+ 005C  9B DE C9			    fmul  
+ 005F  9B D9 1E 0024 R		    fstp prodAB 
+				 
+				    ;****** division A/B 
+ 0064  9B D9 06 0018 R		    fld A_val 
+ 0069  9B D9 06 001C R		    fld B_val  ;sto= B_val, A_val 
+ 006E  9B D9 C9			    fxch       ;sto= A_val, B_val 
+ 0071  9B DE F9			    fdiv 
+ 0074  9B D9 1E 0028 R		    fstp divAB 
+				 
+				    ;***** raiz de 4 
+ 0079  9B D9 06 000C R		    fld C4 
+ 007E  9B D9 FA			    fsqrt 
+ 0081  9B D9 1E 002C R		    fstp sqrtD 
+				 
+				    ;***** Expresion 
+				    ;z=((A+B)*3)/sqrt(4) 
+ 0086  9B D9 06 0020 R		    fld sumaAB 
+ 008B  9B D9 06 0008 R		    fld C3 
+ 0090  9B DE C9			    fmul 
+ 0093  9B D9 06 002C R		    fld sqrtD  ;sto= sqrt(4) ,((A+B)*3) 
+ 0098  9B D9 C9			    fxch 
+ 009B  9B DE F9			    fdiv 
+ 009E  9B D9 1E 0030 R		    fstp exprZ 
+				 
+ 00A3  33 D2			    xor dx, dx 
+ 00A5  8D 16 0028 R		    lea dx, divAB 
+ 00A9				end main 
+Microsoft (R) Macro Assembler Version 5.00                  3/13/26 08:25:20
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0040	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	00A9	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+A_FRAC . . . . . . . . . . . . .  	L WORD	0002	_DATA
+A_INT  . . . . . . . . . . . . .  	L WORD	0000	_DATA
+A_VAL  . . . . . . . . . . . . .  	L DWORD	0018	_DATA
+
+B_FRAC . . . . . . . . . . . . .  	L WORD	0006	_DATA
+B_INT  . . . . . . . . . . . . .  	L WORD	0004	_DATA
+B_VAL  . . . . . . . . . . . . .  	L DWORD	001C	_DATA
+
+C3 . . . . . . . . . . . . . . .  	L DWORD	0008	_DATA
+C4 . . . . . . . . . . . . . . .  	L DWORD	000C	_DATA
+
+DATASEG  . . . . . . . . . . . .  	L WORD	003E	_DATA
+DIVAB  . . . . . . . . . . . . .  	L DWORD	0028	_DATA
+
+EXPRZ  . . . . . . . . . . . . .  	L DWORD	0030	_DATA
+
+HUNDRED  . . . . . . . . . . . .  	L WORD	003C	_DATA
+
+MAIN . . . . . . . . . . . . . .  	L NEAR	0013	_TEXT
+MAKE_REAL_FROM_PARTS . . . . . .  	N PROC	0000	_TEXT	Length = 0013
+
+PRODAB . . . . . . . . . . . . .  	L DWORD	0024	_DATA
+
+SQRTD  . . . . . . . . . . . . .  	L DWORD	002C	_DATA
+SUMAAB . . . . . . . . . . . . .  	L DWORD	0020	_DATA
+
+T1 . . . . . . . . . . . . . . .  	L DWORD	0010	_DATA
+T2 . . . . . . . . . . . . . . .  	L DWORD	0014	_DATA
+TESTT  . . . . . . . . . . . . .  	L DWORD	0034	_DATA
+TMPFRAC  . . . . . . . . . . . .  	L WORD	003A	_DATA
+TMPINT . . . . . . . . . . . . .  	L WORD	0038	_DATA
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  float		
+
+Microsoft (R) Macro Assembler Version 5.00                  3/13/26 08:25:20
+                                                             Symbols-2
+
+
+
+     96 Source  Lines
+     96 Total   Lines
+     36 Symbols
+
+  51162 + 465382 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

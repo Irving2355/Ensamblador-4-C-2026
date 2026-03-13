@@ -1,5 +1,4 @@
 ;punto flotante 
-
 .model small
 .stack 100h
 
@@ -64,4 +63,34 @@ main:
     fadd 
     fstp sumaAB
 
+    ;***** producto ******
+    fld A_val
+    fld B_val
+    fmul 
+    fstp prodAB
+
+    ;****** division A/B
+    fld A_val
+    fld B_val  ;sto= B_val, A_val
+    fxch       ;sto= A_val, B_val
+    fdiv
+    fstp divAB
+
+    ;***** raiz de 4
+    fld C4
+    fsqrt
+    fstp sqrtD
+
+    ;***** Expresion
+    ;z=((A+B)*3)/sqrt(4)
+    fld sumaAB
+    fld C3
+    fmul
+    fld sqrtD  ;sto= sqrt(4) ,((A+B)*3)
+    fxch
+    fdiv
+    fstp exprZ
+
+    xor dx, dx
+    lea dx, divAB
 end main
