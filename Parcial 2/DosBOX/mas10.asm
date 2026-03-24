@@ -24,44 +24,28 @@ main:
     lea dx, buffer
     int 21h
 
-    ;convertir texto a numero
-    mov si, offset buffer 
-    mov cl, [si + 1]
-    xor ch, ch 
-
-    add si, 2 ;apuntar al inicio de numero
-    ;si el inicio y el cx el final
-    mov numero, 0
+    ; convertir a numero
+    lea si, buffer + 2   
+    mov cl, [buffer + 1] 
+    xor ch, ch
+    
+    mov ax, 0            
+    mov bx, 10          
 
     convertir:
-    cmp cx, 0
-    je listo
+    mov dx, 0            
+    mul bx              
+    
+    mov dl, [si]         
+    sub dl, '0'       
+    xor dh, dh           
+    add ax, dx           
+    
+    inc si
+    loop convertir
 
-    mov al, [si] 
-    ;validar que sea digito
-    cmp al, '0'
-    jb siguiente
-    cmp al, '9'
-    ja siguiente
-
-    sub al, '0' ;convertir ascii a numero
-
-    ;numero = numero *10 + digito 
-    mov bx, numero
-    mov ax, bx
-    mov dx, 0
-    mov bx, 10
-    mul bx
-    add ax, al
+    add ax, 10           
     mov numero, ax
-
-    siguiente:
-    inc si 
-    dec cx
-    jmp convertir
-
-    listo:
-    add numero, 10
 
     mov ah, 09h
     lea dx, msg2
