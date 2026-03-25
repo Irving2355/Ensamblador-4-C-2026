@@ -25,9 +25,9 @@ main:
     int 21h
 
     ; convertir a numero
-    lea si, buffer + 2   
+    lea si, buffer + 2   ;si apunta al inicio de la cadena
     mov cl, [buffer + 1] 
-    xor ch, ch
+    xor ch, ch          ;cx formateado con el numero de caracteres
     
     mov ax, 0            
     mov bx, 10          
@@ -36,9 +36,11 @@ main:
     mov dx, 0            
     mul bx              
     
-    mov dl, [si]         
-    sub dl, '0'       
-    xor dh, dh           
+    mov dl, [si]  
+    ;verificacion de si es digito  
+    ;vereficacion por indice si es '.' inc si je convertir     
+    sub dl, '0'  ;ascii a numero     
+    xor dh, dh   ;formateo el registro dx      
     add ax, dx           
     
     inc si
