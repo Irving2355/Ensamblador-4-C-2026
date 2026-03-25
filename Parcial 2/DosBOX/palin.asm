@@ -3,6 +3,8 @@
 .stack 100h
 .data
 msg1 db 13,10,'Escribe una cadena: $'
+msgPalindromo   db 13,10,'Es palindromo $'
+msgNoPalindromo db 13,10,'No es palindromo $'
 
 buffer db 20
         db 0
