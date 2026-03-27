@@ -33,6 +33,10 @@ imc100 dw 0
 
 ParseBufferToReal proc
     ;reiniciar varaibles
+    mov word ptr intPart, 0
+    mov word ptr fracPart, 0
+    mov word ptr fracDiv, 0
+    mov byte ptr seenDot, 0 
 
     mov cl, [si+1]
     xor ch, ch 
@@ -77,9 +81,72 @@ ParseBufferToReal proc
     mov fracDiv, ax
     jmp NextChar 
 
+    setDot:
+    mov seenDot, 1
+    jmp NextChar
 
+    IgnoreChar:
+    ;ignora espacios letras o otros simbolos
+    nop
+
+    NextChar:
+    inc si
+    dec cx 
+    jmp ParseLoop
+
+    ConveretToReal:
+    fild intPart 
+
+    cmp fracDiv, 1
+    je SaveNumber
+
+    fild fracPart
+    fidiv fracDiv
+    fadd 
+    SaveNumber:
+    fstp numParsed
     ret
 ParseBufferToReal endp
+
+
+PrintAX proc
+        push bx
+        push cx
+        push dx 
+
+        cmp ax,0
+        jne convertirNumero
+
+        mov dl, '0'
+        mov ah, 02h
+        int 21h
+        jmp finPrint
+
+        convertirNumero:
+        mov bx, 10
+        xor cx, cx
+
+        ciclo1:
+        xor dx, dx
+        div bx
+        push dx
+        inc cx
+        cmp ax, 0
+        jne ciclo1
+
+        ciclo2:
+        pop dx
+        add dl, '0'
+        mov ah, 02h
+        int 21h
+        loop ciclo2
+
+        finPrint:
+        pop dx
+        pop cx
+        pop bx
+        ret
+PrintAX endp
 
 main:
     mov ax, @data 
@@ -97,6 +164,9 @@ main:
     lea si, bufferPeso
     call ParseBufferToReal
 
+    fld numParsed
+    fstp peso
+
     ;pedir altura
     mov ah, 09h
     lea dx, msgAlt
@@ -109,4 +179,43 @@ main:
     lea si, bufferAlt
     call ParseBufferToReal
 
+    fld numParsed
+    fstp altura
+
+    ;calculo de imc
+    fld altura
+    fmul altura
+    fstp altura2
+    
+    fld peso
+    fdiv altura2
+    fstp imc 
+
+    ;mostrar el resultado
+    mov ah, 09h
+    lea dx, msgRes
+    int 21h
+
+    ;convertir el imc escalado a 100
+    ;28.88 -> 2888
+    fld imc 
+    fimul cien 
+    fistp imc100 
+
+    mov ax, imc100 
+    xor dx, dx
+    mov bx, 100
+    div bx
+
+    call PrintAX
+
+    mov dl, '.'
+    mov ah, 02h
+    int 21h
+
+    mov ax, dx 
+    call Print2Digits
+
+    mov ah, 4Ch
+    int 21h
 end main
