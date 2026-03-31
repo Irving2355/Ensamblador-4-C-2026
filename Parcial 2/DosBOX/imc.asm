@@ -19,7 +19,7 @@ intPart dw 0
 fracPart dw 0
 fracDiv dw 1
 digit dw 0
-seenDot dw 0
+seenDot db 0
 
 numParsed dd 0.0
 peso dd 0.0
@@ -35,7 +35,7 @@ ParseBufferToReal proc
     ;reiniciar varaibles
     mov word ptr intPart, 0
     mov word ptr fracPart, 0
-    mov word ptr fracDiv, 0
+    mov word ptr fracDiv, 1
     mov byte ptr seenDot, 0 
 
     mov cl, [si+1]
@@ -148,6 +148,32 @@ PrintAX proc
         ret
 PrintAX endp
 
+Print2Digits proc
+    push bx
+    push dx
+
+    xor dx, dx
+    mov bx, 10
+    div bx  
+
+    mov bl, al
+    mov bh, dl 
+
+    mov dl, bl
+    add dl, '0'
+    mov ah, 02h
+    int 21h
+
+    mov dl, bh
+    add dl, '0'
+    mov ah, 02h
+    int 21h
+
+    pop dx
+    pop bx
+    ret
+Print2Digits endp
+
 main:
     mov ax, @data 
     mov ds, ax
@@ -202,6 +228,7 @@ main:
     fimul cien 
     fistp imc100 
 
+    xor ax, ax 
     mov ax, imc100 
     xor dx, dx
     mov bx, 100
