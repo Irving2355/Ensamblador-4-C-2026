@@ -22,6 +22,59 @@ msgMostrar db 'Tu nombre fue: $'
 msgLimpio db 'El buffer original fue limpiado $'
 msgRepetir db 'Otra vez (S/N): $' 
 .code
+
+LimpiarPantalla proc
+    ;int 10h y ah = 06h
+    ;limpiar la ventana
+    ;si al = 00h se limpia toda la area
+    mov ah, 06h
+    mov al, 00h
+    mov bh, 07h
+    mov ch, 00h
+    mov cl, 00h
+    mov dh, 24h
+    mov dl, 79h
+    int 10h
+
+    mov dh, 0
+    mov dl, 0
+    call PosicionarCursor
+    ret
+LimpiarPantalla endp
+
+PosicionarCursor proc
+    ;dh = fila
+    ;dl = columna
+    ;int 10h y ah = 02h posiciona
+    mov ah, 02h
+    mov bh, 00h
+    int 10h
+    ret 
+PosicionarCursor endp
+
+ImprimirColor proc 
+    siguiente_caracter:
+    lodsb ;al = [si] si avanza automaticamente
+    cmp al, '$'
+    je fin_imprimir_color
+
+    ;imprimir un caracter con atributo
+    mov ah, 09h
+    mov bh, 00h
+    mov cx, 1
+    int 10h
+
+    ;avanza visualmente el cursor
+    mov ah, 0Eh
+    mov bh, 00h 
+    int 10h
+
+    jmp siguiente_caracter
+
+    fin_imprimir_color:
+    ret 
+ImprimirColor endp 
+
 main:
     ;Priemro cargar el ds 
     mov ax, @data
