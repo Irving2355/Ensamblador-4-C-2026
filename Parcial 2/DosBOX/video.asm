@@ -17,7 +17,7 @@ cadNombre db 30 dup(0)
 nombreLimpio db 31 dup('$')
 
 titulo db '****Practica Final: Cadenas y video ****$'
-msgPedir db 'Escribe tu nombre: $'
+msgPedir db 13,10,'Escribe tu nombre: $'
 msgMostrar db 'Tu nombre fue: $'
 msgLimpio db 'El buffer original fue limpiado $'
 msgRepetir db 'Otra vez (S/N): $' 
@@ -74,6 +74,40 @@ ImprimirColor proc
     fin_imprimir_color:
     ret 
 ImprimirColor endp 
+
+CopiarCadena proc 
+    lea si, cadNombre
+    lea di, nombreLimpio
+
+    xor cx, cx
+    mov cl, contNombre
+
+    jcxz fin_copiado
+
+    copiar_loop:
+    mov al, [si]
+    mov [di], al
+    inc si 
+    inc di 
+    loop copiar_loop
+
+    fin_copiado:
+    mov byte ptr [di], '$'
+    ret 
+CopiarCadena endp
+
+LimpiarBuffer proc 
+    mov contNombre, 0
+    lea di, cadNombre
+    mov cx, 30
+    mov al, 0
+
+    limpiar_loop:
+    mov [di], al 
+    inc di 
+    loop limpiar_loop
+    ret 
+LimpiarBuffer endp
 
 main:
     ;Priemro cargar el ds 
@@ -158,6 +192,6 @@ main:
     int 21h
 
     repetir:
-    call LimpiarDestino
+    ;call LimpiarDestino
     jmp inicio_programa
 end main
