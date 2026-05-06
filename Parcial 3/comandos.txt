@@ -1,0 +1,9 @@
+//comandos en linux 
+nasm -f elf64 procesos.asm -o procesos.o 
+
+gcc main.c procesos.o -o PractiaX.exe 
+
+//comandos en MacOS
+nasm -f macho64 procesos.asm -o procesos.o 
+
+clang main.c procesos.o -o PractiaX
