@@ -58,7 +58,8 @@ int main(){
         printf("Columna: ");
         scanf("%d", &columna1);
         printf("\nSeleccione una direccion WASD\n");
-        scanf("%c", &direccion);
+        fflush(stdin);
+        scanf(" %c", &direccion);
 
         direccion = tolower(direccion);
 
@@ -85,7 +86,25 @@ int main(){
             getchar();
             continue;
         }
-    } while (condition);
+
+        intercambiar(
+            &matriz[0][0],
+            COLUMNAS,
+            fila1,
+            columna1,
+            fila2,
+            columna2
+        );
+
+        printf("\nMatriz nueva\n");
+        imprimir(matriz);
+
+        printf("otra vez?: ");
+        fflush(stdin);
+        scanf(" %c", &continuar);
+
+        tolower(continuar);
+    } while (continuar == 's');
     
 
     system("pause");
